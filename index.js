@@ -1,49 +1,45 @@
-const bodyParser = require('body-parser');
-const express = require('express')
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
-const app = express()
-app.use(bodyParser.json())
+// Define student schema
+const studentSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    age: { type: Number, required: true },
+    gender: { type: String, enum: ['Male', 'Female', 'Other'], required: true },
+    grade: { type: String },
+    subjects: [{ type: String }],
+});
 
-mongoose.connect("mongodb://127.0.0.1:27017/", { useNewUrlParser: true })
-    .then(() => console.log('Connected to the server successfully'))
-    .catch((err) => console.log(err))
+// Create the student model
+const Student = mongoose.model('Student', studentSchema);
 
-// Create a Schemea
-const StudentSchema = mongoose.Schema({
-    name: String,
-    roll: Number,
-    attendence: Boolean,
-    subjects: Array
+// Connect to MongoDB Atlas
+mongoose.connect('mongodb+srv://theshrish:<testpass>@cluster0.9hfwtmo.mongodb.net/TestDB/', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
 })
+    .then(() => {
+        console.log('Connected to MongoDB Atlas');
 
-// Create a Model
-const StudentModel = mongoose.model('StudentModel', StudentSchema)
+        // Create a new student
+        const newStudent = new Student({
+            name: 'John Doe',
+            age: 18,
+            gender: 'Male',
+            grade: '10th',
+            subjects: ['Math', 'Science', 'English'],
+        });
 
-app.get('/', (req, res) => { res.send('<h1>Success</h1>') })
-
-const shrish = new StudentModel({
-    name: "Samarth",
-    roll: 215,
-    attendence: false,
-    subjects: ['kj', 'kjkljk', 'kjkjkj']
-})
-shrish.save((err, docs) => {
-    if (err) throw (err)
-    res.send(docs)
-})
-// app.get('/dumb', (req, res) => {
-//     StudentModel.find({ name: 'Shrish' }, (err, docs) => {
-//         if (err) throw (err)
-//         console.log(docs)
-//     })
-// })
-
-const find = async () => {
-    const data = await StudentModel.findOne({ name: 'Shrish' }, (err, docs) => {
-        console.log(docs)
+        // Save the student to the database
+        newStudent.save()
+            .then(() => {
+                console.log('Student saved successfully');
+                mongoose.disconnect();
+            })
+            .catch((error) => {
+                console.error('Error saving student:', error);
+                mongoose.disconnect();
+            });
     })
-}
-
-find()
-app.listen(8080)
+    .catch((error) => {
+        console.error('Error connecting to MongoDB Atlas:', error);
+    });
