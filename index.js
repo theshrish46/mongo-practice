@@ -9,37 +9,63 @@ const studentSchema = new mongoose.Schema({
     subjects: [{ type: String }],
 });
 
+const teacherSchema = new mongoose.Schema({
+    name: String,
+    age: Number,
+    salary: Number,
+    grade: String,
+    subject: String
+})
+
 // Create the student model
-const Student = mongoose.model('Student', studentSchema);
+const Student = mongoose.model('Student', studentSchema)
+const Teacher = mongoose.model('Teacher', teacherSchema)
 
 // Connect to MongoDB Atlas
-mongoose.connect('mongodb+srv://theshrish:<testpass>@cluster0.9hfwtmo.mongodb.net/TestDB/', {
+const URL = `mongodb+srv://testOne:testpass@testcluster.q63thel.mongodb.net/`
+
+mongoose.connect(URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-})
-    .then(() => {
-        console.log('Connected to MongoDB Atlas');
+}).then(() => {
+    console.log('Connected to MongoDB Atlas');
 
-        // Create a new student
-        const newStudent = new Student({
-            name: 'John Doe',
-            age: 18,
-            gender: 'Male',
-            grade: '10th',
-            subjects: ['Math', 'Science', 'English'],
+    // Create a new student
+    const newStudent = new Student({
+        name: 'John Doe',
+        age: 18,
+        gender: 'Male',
+        grade: '10th',
+        subjects: ['Math', 'Science', 'English'],
+    });
+    const newStudent2 = new Student({
+        name: 'John Boe',
+        age: 15,
+        gender: 'Male',
+        grade: '10th',
+        subjects: ['Math', 'Science', 'English'],
+    });
+
+    // Save the student to the database
+    newStudent.save()
+        .then(() => {
+            console.log('Student saved successfully');
+            mongoose.disconnect();
+        })
+        .catch((error) => {
+            console.error('Error saving student:', error);
+            mongoose.disconnect();
+        });
+    newStudent2.save()
+        .then(() => {
+            console.log('Student saved successfully');
+            mongoose.disconnect();
+        })
+        .catch((error) => {
+            console.error('Error saving student:', error);
+            mongoose.disconnect();
         });
 
-        // Save the student to the database
-        newStudent.save()
-            .then(() => {
-                console.log('Student saved successfully');
-                mongoose.disconnect();
-            })
-            .catch((error) => {
-                console.error('Error saving student:', error);
-                mongoose.disconnect();
-            });
-    })
-    .catch((error) => {
-        console.error('Error connecting to MongoDB Atlas:', error);
-    });
+}).catch((error) => {
+    console.error('Error connecting to MongoDB Atlas:', error);
+});
